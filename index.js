@@ -66,3 +66,8 @@ connection.connect(err => {
     else console.log("Successfully connected to DB");
     return bot.login(auth.token);
 });
+
+
+//
+// TODO List
+// Add user specific purge

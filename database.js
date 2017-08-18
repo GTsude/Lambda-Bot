@@ -20,7 +20,7 @@ const logMessage = (connection, message) => connection.query(createInsertQuery('
     channel: message.channel.id,
     userid: message.author.id,
     username: message.author.username,
-    message: message.content.toString() + message.attachments.size > 0 ? `Attachments::[${message.attachments.array().map( a => a.url).join(', ')}]` : '',
+    message: message.content.toString() + (message.attachments.size > 0 ? `Attachments::[${message.attachments.map( a => a.url).join(', ')}]` : ''),
     timestamp: moment().format('YYYY-MM-DD HH:mm:ss')
 }));
 
