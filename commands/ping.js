@@ -6,8 +6,8 @@ module.exports = {
     usage: 'ping',
     run: async({message}) => {
         const date = moment();
-        const m = await message.channel.send("Ping!");
+        const m = await message.channel.send("Pong!");
 
-        m.edit(`Ping! Took \`${moment(m.timestamp) - date}\` ms`);
+        m.edit(`Pong! Took \`${moment(m.timestamp) - date}\` ms`);
     }
 };

@@ -12,7 +12,8 @@ const {
     createUpdateQuery,
     logMessage,
     createConnection,
-    createNow
+    createNow,
+    updateUser
 } = require('./database.js');
 
 const {
@@ -42,15 +43,12 @@ bot.on('message', async message => {
     const then = moment(user.lastmessage_timestamp);
     const now = moment();
 
-    const next = (now - then > 60 * 1000) ? {
+    updateUser(connection, user.id, () => R.merge({
+        lastmessage_timestamp: createNow()
+    }, (now - then > 60 * 1000) ? {
         balance: user.balance + 1,
         experience: user.experience + Math.floor(Math.random() * 500 + 100)
-    } : {};
-
-    const q = createUpdateQuery('users', R.merge({
-        lastmessage_timestamp: createNow()
-    }, next), `id = ${user.id}`);
-    connection.query(q);
+    } : {}));
 
     commands.map(command => handleMessage({
         connection,

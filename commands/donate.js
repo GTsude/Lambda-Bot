@@ -5,7 +5,7 @@ module.exports = {
     name: 'donate',
     match: /^(donate|sendmoney)\ ([0-9]+)\ (.+)/gi,
     usage: 'donate <amount> <mention>',
-    nearmatch: /^(donate|sendmoney).+/gi,
+    nearmatch: /^(donate|sendmoney).*/gi,
     run: async({message, matches, connection}) => {
         const amount = parseInt(matches[2], 10);
         const receiverID = getMention(message);
