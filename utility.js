@@ -1,5 +1,5 @@
 const { stripIndents } = require('common-tags');
-const { owner } = require("../config.json");
+const { owner } = require("./config.json");
 
 const getMention = (message) =>
     message.mentions.users.size === 0 ? message.author.id : message.mentions.users.first().id;
