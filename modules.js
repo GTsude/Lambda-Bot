@@ -1,7 +1,8 @@
 const R = require('ramda');
 
 const {
-    prefix
+    prefix,
+    masters
 } = require("./config.json");
 
 const handleMessage = (params) => {
@@ -15,7 +16,7 @@ const handleMessage = (params) => {
 
     const matches = command.match.exec(sub);
 
-    return (command.permissionLevel === -1 && message.author.id !== '119782414175305728') ?
+    return (command.permissionLevel === -1 && R.contains(masters)(message.author.id)) ?
         0 :
         isPrefixed ?
         matches ?
