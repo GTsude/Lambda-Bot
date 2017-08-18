@@ -1,4 +1,4 @@
-const { createArgs } = require("../commands.js");
+const { createArgs } = require("../modules.js");
 const { reportError } = require("../utility.js");
 
 module.exports = {

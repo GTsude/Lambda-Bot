@@ -1,5 +1,5 @@
-const { findCommand, createArgs } = require("../commands.js");
-const { stripIndents } = require('common-tags'); 
+const { findModule, createArgs } = require("../modules.js");
+const { stripIndents } = require('common-tags');
 
 module.exports = {
     name: 'help',
@@ -17,7 +17,7 @@ module.exports = {
                 ${cmds}\`\`\`
                 `);
         } else {
-            const command = findCommand(commands, args[1]);
+            const command = findModule(commands, args[1]);
 
             return command ? message.reply(stripIndents `**${command.name}**
                 Usage: \`${command.usage}\`

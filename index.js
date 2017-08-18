@@ -16,9 +16,8 @@ const {
 } = require('./database.js');
 
 const {
-    createCommand,
-    runCommand
-} = require('./commands.js');
+    handleMessage
+} = require('./modules.js');
 
 const fs = require("fs");
 
@@ -33,34 +32,33 @@ bot.on('ready', () => {
     console.log("Bot is ready");
 });
 
-bot.on('message', message => {
+bot.on('message', async message => {
     console.log(`${message.author.username}: ${message.content}`);
 
     logMessage(connection, message);
 
-    // TODO: change to async, and change to updateUser
-    getUser(connection, message.author.id).then(user => {
-        const then = moment(user.lastmessage_timestamp);
-        const now = moment();
+    const user = await getUser(connection, message.author.id);
 
-        const next = (now - then > 60 * 1000) ? {
-            balance: user.balance + 1,
-            experience: user.experience + Math.floor(Math.random() * 500 + 100)
-        } : {};
+    const then = moment(user.lastmessage_timestamp);
+    const now = moment();
 
-        const q = createUpdateQuery('users', R.merge({
-            lastmessage_timestamp: createNow()
-        }, next), `id = ${user.id}`);
-        connection.query(q);
+    const next = (now - then > 60 * 1000) ? {
+        balance: user.balance + 1,
+        experience: user.experience + Math.floor(Math.random() * 500 + 100)
+    } : {};
 
-        commands.map(command => runCommand({
-            connection,
-            command,
-            message,
-            commands,
-            bot
-        }));
-    }).catch(e => reportError(bot, message, e));
+    const q = createUpdateQuery('users', R.merge({
+        lastmessage_timestamp: createNow()
+    }, next), `id = ${user.id}`);
+    connection.query(q);
+
+    commands.map(command => handleMessage({
+        connection,
+        command,
+        message,
+        commands,
+        bot
+    }));
 });
 
 connection.connect(err => {

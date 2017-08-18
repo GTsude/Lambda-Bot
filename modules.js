@@ -4,21 +4,7 @@ const {
     prefix
 } = require("./config.json");
 
-const createCommand = (attributes) => {
-    const defaults = {
-        name: 'no-name',
-        run: () => 0,
-        match: /^...$/g,
-        usage: '???',
-        help: 'No help provided',
-        description: 'No description provided',
-        permissionLevel: 0,
-    };
-
-    return R.merge(defaults, attributes);
-};
-
-const runCommand = (params) => {
+const handleMessage = (params) => {
     const {
         connection,
         command,
@@ -44,13 +30,12 @@ const runCommand = (params) => {
 
 const createSub = message => message.content.substring(prefix.length);
 const createArgs = message => createSub(message).split(" ");
-const findCommand = (commands, test) =>
+const findModule = (commands, test) =>
     commands.filter(command => command.name === test)[0];
 
 module.exports = {
     createSub,
     createArgs,
-    findCommand,
-    createCommand,
-    runCommand
+    findModule,
+    handleMessage
 };
