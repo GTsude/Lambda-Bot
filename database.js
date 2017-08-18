@@ -54,6 +54,7 @@ const updateUser = (connection, userID, modfn) => new Promise(function(resolve, 
 
 const getUser = (conn, userID) => new Promise((resolve, reject) => {
     conn.query(getUserQuery(userID), (err, rows) => {
+        console.log(err, rows);
         if (err) reject(err);
         else if (rows.length === 0) createUser(conn, userID).then(resolve).catch(reject);
         else resolve(rows[0]);

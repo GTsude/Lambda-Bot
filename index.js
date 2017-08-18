@@ -26,8 +26,8 @@ const connection = createConnection(auth);
 
 const bot = new Discord.Client();
 
-const items = fs.readdirSync(__dirname + '/commands');
-const commands = items.map(i => require(`./commands/${i}`));
+const items = fs.readdirSync(__dirname + '/modules');
+const commands = items.map(i => require(`./modules/${i}`));
 
 bot.on('ready', () => {
     console.log("Bot is ready");
