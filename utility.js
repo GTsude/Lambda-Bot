@@ -7,10 +7,14 @@ const getMention = (message) =>
 const reportError = (bot, message, error) =>
     bot.users.get(owner).send(stripIndents `An Error has occured in '${message.guild ? message.guild.name : message.channel.name}': \`${error} @ ${error.stack}\``);
 
+
+// Async sleep event. usage: await sleep(5000); // will sleep for 5000ms
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+// Pretty obv
 const escapeQuotes = string => string.toString().replace(/\'/gi, '\\\'');
 
+// Self destroying message
 const selfDestroyMessage = async (message, text, timer = 5000) => {
     const m = await message.reply(text);
     await sleep(timer);

@@ -19,7 +19,7 @@ module.exports = {
             const user = await getUser(connection, search);
             const level = calculateLevelFromAcc(user.experience);
             const req = levelRequirement(level + 1);
-            const nextLevelExperience = accLevelRequirement(level + 1) - user.experience;
+            const nextLevelExperience = req - (accLevelRequirement(level + 1) - user.experience);
             message.channel.send(`**${bot.users.get(user.id).username}** is level **${level}**. [${nextLevelExperience}/${req}].`);
         }catch(e) {
             console.error(e);

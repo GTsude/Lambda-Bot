@@ -8,7 +8,8 @@ module.exports = {
     name: 'choose',
     match: /^(choose)\ (.+)/gi,
     usage: 'choose option1,option2,...',
-    help: 'For those occasions where you can\'t make a simple decision on your own..',
+    help: 'Simply seperate your possible options using commas and you\'ll get back one of them! Good luck!',
+    description: 'For those occasions where you can\'t make a simple decision on your own..',
     run: async({message, matches}) => {
         console.log('choosing....');
         message.channel.send(chooseOption(matches[2])); // Call chooseOption with param matches[2]

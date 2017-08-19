@@ -1,5 +1,5 @@
 const { getUser, updateUser } = require("../database.js");
-const { getMention } = require("../utility.js");
+const { getMention, selfDestroyMessage } = require("../utility.js");
 
 module.exports = {
     name: 'donate',
@@ -10,11 +10,11 @@ module.exports = {
         const amount = parseInt(matches[2], 10);
         const receiverID = getMention(message);
 
-        if (receiverID === message.author.id) return message.channel.send("You can't give money to yourself, goofball");
+        if (receiverID === message.author.id) return selfDestroyMessage(message, "You can't give money to yourself, goofball");
 
         const [sender, receiver] = await Promise.all([getUser(connection, message.author.id), getUser(connection, getMention(message))]);
 
-        if (sender.balance < amount) return message.channel.send(`You do not have enough money! You have **$${sender.balance}**!`);
+        if (sender.balance < amount) return selfDestroyMessage(message, `You do not have enough money! You have **$${sender.balance}**!`);
 
         await updateUser(connection, sender.id, $ => ({
             balance: $.balance - amount

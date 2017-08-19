@@ -4,7 +4,7 @@ module.exports = {
     usage: 'eval <code>',
     nearmatch: /^(eval|\!)/gi,
     permissionLevel: 1000,
-    run: ({message, matches}) => {
+    run: ({message, matches, bot}) => {
         const clean = (text) => { //Used in eval code I stole from someone else :) x2
             return (typeof(text) === "string") ?
                 text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203)) :

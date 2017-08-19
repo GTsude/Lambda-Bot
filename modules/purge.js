@@ -1,4 +1,4 @@
-    const { createArgs } = require("../modules.js");
+const { createArgs } = require("../modules.js");
 const { reportError } = require("../utility.js");
 
 module.exports = {
@@ -6,7 +6,7 @@ module.exports = {
     match: /^purge\ *([0-9])*$/gi,
     usage: 'purge [messages]',
     permissionLevel: 100,
-    run: ({message, matches}) => {
+    run: ({message, matches, bot}) => {
         const args = createArgs(message);
 
         const purgeAmmount = args.length === 1 ? 20 : args[1];

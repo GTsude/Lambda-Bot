@@ -17,7 +17,9 @@ const {
 } = require('./database.js');
 
 const {
-    handleMessage
+    handleMessage,
+    handleEvent,
+    forceDefaults
 } = require('./modules.js');
 
 const fs = require("fs");
@@ -26,8 +28,17 @@ const connection = createConnection(auth);
 
 const bot = new Discord.Client();
 
-const items = fs.readdirSync(__dirname + '/commands');
-const commands = items.map(i => require(`./commands/${i}`));
+// Here we load the modules from `./modules/`
+const items = fs.readdirSync(__dirname + '/modules');
+const mods = items.map(i => forceDefaults(require(`./modules/${i}`)));
+
+// Some global variables.
+const universals = {
+    connection,
+    mods,
+    Discord,
+    bot
+};
 
 bot.on('ready', () => {
     console.log("Bot is ready");
@@ -35,8 +46,6 @@ bot.on('ready', () => {
 
 bot.on('message', async message => {
     console.log(`${message.author.username}: ${message.content}`);
-
-    logMessage(connection, message);
 
     const user = await getUser(connection, message.author.id);
 
@@ -50,13 +59,26 @@ bot.on('message', async message => {
         experience: user.experience + Math.floor(Math.random() * 500 + 100)
     } : {}));
 
-    commands.map(command => handleMessage({
-        connection,
-        command,
+    // We merge universal variables with some local variables and pass them so they can be used in the bot.
+    mods.map(mod => handleMessage(R.merge(universals, {
+        mod,
+        message
+    })));
+
+    mods.map(mod => handleEvent("message", R.merge(universals, {
+        mod,
         message,
-        commands,
-        bot
-    }));
+        user
+    })));
+});
+
+bot.on("messageReactionAdd", (messageReaction, user) => {
+    // NOTE: This event will not run on old messages, only on ones the bot has seen, potential TODO
+    mods.map(mod => handleEvent("messageReactionAdd", R.merge(universals, {
+        mod,
+        messageReaction,
+        user
+    })));
 });
 
 connection.connect(err => {
@@ -65,7 +87,5 @@ connection.connect(err => {
     return bot.login(auth.token);
 });
 
-
-//
 // TODO List
 // Add user specific purge

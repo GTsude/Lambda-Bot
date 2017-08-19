@@ -1,6 +1,3 @@
-// TODO: Cast EXP to unsigned int rather than signed
-
-
 const mysql = require("mysql");
 const moment = require('moment');
 const R = require("ramda");
@@ -41,7 +38,9 @@ const getUserQuery = userID => `SELECT * FROM users WHERE id='${userID}'`;
 
 const updateUser = (connection, userID, modfn) => new Promise(function(resolve, reject) {
     getUser(connection, userID).then(user => {
+        // modfn :: Functor<user>
         const after = modfn(user);
+
         const query = createUpdateQuery('users', after, `id = ${userID}` );
 
         connection.query(query, (err, rows) => {
