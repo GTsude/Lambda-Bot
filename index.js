@@ -18,7 +18,8 @@ const {
 
 const {
     handleMessage,
-    handleEvent
+    handleEvent,
+    forceDefaults
 } = require('./modules.js');
 
 const fs = require("fs");
@@ -29,9 +30,9 @@ const bot = new Discord.Client();
 
 // Here we load the modules from `./modules/`
 const items = fs.readdirSync(__dirname + '/modules');
-const mods = items.map(i => require(`./modules/${i}`));
+const mods = items.map(i => forceDefaults(require(`./modules/${i}`)));
 
-// Some global v ariables.
+// Some global variables.
 const universals = {
     connection,
     mods,

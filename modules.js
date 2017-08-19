@@ -59,6 +59,10 @@ const handleMessage = (params) => {
     }
 };
 
+const forceDefaults = mod => R.merge({
+    permissionLevel: 0
+}, mod);
+
 const createSub = message => message.content.substring(prefix.length);
 const createArgs = message => createSub(message).split(" ");
 const findModule = (mods, test) =>
@@ -69,5 +73,7 @@ module.exports = {
     createArgs,
     findModule,
     handleMessage,
-    handleEvent 
+    handleEvent,
+    calculatePermissionLevel,
+    forceDefaults
 };
