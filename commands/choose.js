@@ -1,10 +1,7 @@
 const R = require("ramda");
 
-const chooseOption = options => {
-    console.log(options);
-    const items = options.split(',').map(R.trim);
-    console.log(items);
-    return items[Math.floor(Math.random() * items.length)];
+const chooseOption = options => {const items = options.split(',').map(R.trim); // Converts param options to array items
+    return items[Math.floor(Math.random() * items.length)]; // Returns a random item
 };
 
 module.exports = {
@@ -14,6 +11,6 @@ module.exports = {
     help: 'For those occasions where you can\'t make a simple decision on your own..',
     run: async({message, matches}) => {
         console.log('choosing....');
-        message.channel.send(chooseOption(matches[2]));
+        message.channel.send(chooseOption(matches[2])); // Call chooseOption with param matches[2]
     }
 };
