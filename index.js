@@ -63,10 +63,16 @@ bot.on('message', async message => {
         mod,
         message
     })));
+
+    mods.map(mod => handleEvent("message", R.merge(universals, {
+        mod,
+        message,
+        user
+    })));
 });
 
 bot.on("messageReactionAdd", (messageReaction, user) => {
-    // TODO!!
+    // NOTE: This event will not run on old messages, only on ones the bot has seen, potential TODO
     mods.map(mod => handleEvent("messageReactionAdd", R.merge(universals, {
         mod,
         messageReaction,

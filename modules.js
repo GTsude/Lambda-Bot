@@ -68,5 +68,6 @@ module.exports = {
     createSub,
     createArgs,
     findModule,
-    handleMessage
+    handleMessage,
+    handleEvent 
 };
