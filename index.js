@@ -17,7 +17,8 @@ const {
 } = require('./database.js');
 
 const {
-    handleMessage
+    handleMessage,
+    handleEvent
 } = require('./modules.js');
 
 const fs = require("fs");
@@ -26,8 +27,17 @@ const connection = createConnection(auth);
 
 const bot = new Discord.Client();
 
+// Here we load the modules from `./modules/`
 const items = fs.readdirSync(__dirname + '/modules');
-const commands = items.map(i => require(`./modules/${i}`));
+const mods = items.map(i => require(`./modules/${i}`));
+
+// Some global v ariables.
+const universals = {
+    connection,
+    mods,
+    Discord,
+    bot
+};
 
 bot.on('ready', () => {
     console.log("Bot is ready");
@@ -35,8 +45,6 @@ bot.on('ready', () => {
 
 bot.on('message', async message => {
     console.log(`${message.author.username}: ${message.content}`);
-
-    logMessage(connection, message);
 
     const user = await getUser(connection, message.author.id);
 
@@ -50,13 +58,20 @@ bot.on('message', async message => {
         experience: user.experience + Math.floor(Math.random() * 500 + 100)
     } : {}));
 
-    commands.map(command => handleMessage({
-        connection,
-        command,
-        message,
-        commands,
-        bot
-    }));
+    // We merge universal variables with some local variables and pass them so they can be used in the bot.
+    mods.map(mod => handleMessage(R.merge(universals, {
+        mod,
+        message
+    })));
+});
+
+bot.on("messageReactionAdd", (messageReaction, user) => {
+    // TODO!!
+    mods.map(mod => handleEvent("messageReactionAdd", R.merge(universals, {
+        mod,
+        messageReaction,
+        user
+    })));
 });
 
 connection.connect(err => {
@@ -65,7 +80,5 @@ connection.connect(err => {
     return bot.login(auth.token);
 });
 
-
-//
 // TODO List
 // Add user specific purge
