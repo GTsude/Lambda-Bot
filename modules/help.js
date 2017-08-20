@@ -19,7 +19,7 @@ module.exports = {
 
             return command ? message.reply(stripIndents `**${command.name}**
                 Usage: \`${command.usage}\`
-                '${command.help}'`) :
+                ${command.help}`) :
                 message.reply("Command not found!");
         }
 
