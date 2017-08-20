@@ -3,6 +3,7 @@ const auth = require('./config.json');
 const {
     prefix
 } = auth;
+
 const R = require('ramda');
 const mysql = require('mysql');
 const moment = require('moment');
@@ -65,11 +66,17 @@ bot.on('message', async message => {
         message
     })));
 
-    mods.map(mod => handleEvent("message", R.merge(universals, {
-        mod,
-        message,
-        user
-    })));
+    mods.map(mod => {
+        try {
+            handleEvent("message", R.merge(universals, {
+                mod,
+                message,
+                user
+            }));
+        } catch (e) {
+            console.error(e);
+        }
+    });
 });
 
 bot.on("messageReactionAdd", (messageReaction, user) => {

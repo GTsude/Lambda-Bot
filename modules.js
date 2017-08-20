@@ -5,15 +5,21 @@ const {
     masters
 } = require("./config.json");
 
-const { selfDestroyMessage } = require("./utility.js");
+const {
+    selfDestroyMessage
+} = require("./utility.js");
 
-const { stripIndents } = require("common-tags");
+const {
+    stripIndents
+} = require("common-tags");
 
 // TODO: Relocate and reimplement
 const calculatePermissionLevel = message => R.contains(message.author.id)(masters) ? 1000 : 0;
 
 const handleEvent = (event, params) => {
-    const {mod} = params;
+    const {
+        mod
+    } = params;
 
     // Capitalize first character
     const evtName = event[0].toUpperCase() + event.substring(1);
@@ -30,20 +36,22 @@ const handleMessage = (params) => {
         bot
     } = params;
 
-    if ( ! mod.run || ! mod.match) return; // It needs to have a `run` method and a `match` prop
-    if ( message.author === bot.user ) return; // Can't be itself
+    if (!mod.run || !mod.match) return; // It needs to have a `run` method and a `match` prop
+    if (message.author.id === bot.user.id) return; // Can't be itself
 
     const sub = createSub(message);
     const isPrefixed = message.content.startsWith(prefix);
 
-    // RegExp matches
-    const matches = mod.match.exec(sub);
+    const matcher = new RegExp(mod.match);
 
+    // RegExp matches
+    const matches = matcher.exec(sub);
+    
     // Check prefix
     if (isPrefixed) {
         if (matches && (!mod.channel || mod.channel.test(message.channel.type))) {
             // Too low permission level
-            if (mod.permissionLevel > calculatePermissionLevel(message) ) {
+            if (mod.permissionLevel > calculatePermissionLevel(message)) {
                 return selfDestroyMessage(message, "Oh noes! It looks like you do not have permission to use this command!").catch(console.error);
             } else {
                 // Provide matches too

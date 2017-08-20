@@ -3,17 +3,18 @@ const { reportError } = require("../utility.js");
 
 module.exports = {
     name: 'purge',
-    match: /^purge\ *([0-9])*$/gi,
+    match: /^(purge)\ *([0-9])*$/gi,
     usage: 'purge [messages]',
     permissionLevel: 100,
-    run: ({message, matches, bot}) => {
+    run: async ({message, matches, bot}) => {
         const args = createArgs(message);
 
-        const purgeAmmount = args.length === 1 ? 20 : args[1];
+        const purgeAmount = parseInt(args[1], 10) || 5;
 
-        message.channel.fetchMessages({
-            limit: purgeAmmount
-        }).then(messages =>
-            message.channel.bulkDelete(messages)).catch(e => reportError(bot, message, e));
+        const messages = await message.channel.fetchMessages({
+            limit: purgeAmount
+        });
+
+        await message.channel.bulkDelete(messages);
     }
 };

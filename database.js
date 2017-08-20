@@ -34,11 +34,14 @@ const createUpdateQuery = (table, dict, predicates) =>
         `${key} = '${dict[key]}'`
     ).join(", ")} ${predicates ? `WHERE ${predicates}` : ''}`;
 
-const getUserQuery = userID => `SELECT * FROM users WHERE id='${userID}'`;
+const createSelectQuery = (table, predicates) => `SELECT * FROM ${table} WHERE ${predicates}`;
+
+const createDeleteQuery = (table, predicates) => stripIndents `DELETE ${table} WHERE ${predicates}`;
+
+const getUserQuery = userID => createSelectQuery('users', `id='${userID}'`);
 
 const updateUser = (connection, userID, modfn) => new Promise(function(resolve, reject) {
     getUser(connection, userID).then(user => {
-        // modfn :: Functor<user>
         const after = modfn(user);
 
         const query = createUpdateQuery('users', after, `id = ${userID}` );
@@ -67,9 +70,11 @@ const createUserQuery = userID => {
         balance: 0,
         experience: 0,
         created_timestamp: date,
-        lastmessage_timestamp: date
+        lastmessage_timestamp: date,
+        lastimage_timestamp: date
     });
 };
+
 
 
 const createUser = (connection, userID) => new Promise((resolve, reject) => {
@@ -83,6 +88,7 @@ module.exports = {
     createConnection,
     createInsertQuery,
     createUpdateQuery,
+    createSelectQuery,
     createUser,
     getUser,
     updateUser,
