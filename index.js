@@ -46,37 +46,42 @@ bot.on('ready', () => {
 });
 
 bot.on('message', async message => {
-    console.log(`${message.author.username}: ${message.content}`);
+    try {
+        console.log(`${message.author.username}: ${message.content}`);
 
-    const user = await getUser(connection, message.author.id);
+        const user = await getUser(connection, message.author.id);
 
-    const then = moment(user.lastmessage_timestamp);
-    const now = moment();
+        const then = moment(user.lastmessage_timestamp);
+        const now = moment();
 
-    updateUser(connection, user.id, () => R.merge({
-        lastmessage_timestamp: createNow()
-    }, (now - then > 60 * 1000) ? {
-        balance: user.balance + 1,
-        experience: user.experience + Math.floor(Math.random() * 500 + 100)
-    } : {}));
-
-    // We merge universal variables with some local variables and pass them so they can be used in the bot.
-    mods.map(mod => handleMessage(R.merge(universals, {
-        mod,
-        message
-    })));
-
-    mods.map(mod => {
-        try {
-            handleEvent("message", R.merge(universals, {
-                mod,
-                message,
-                user
+        if ( now - then > 60 * 1000 ) {
+            await updateUser(connection, message.author.id, $ => ({
+                balance: user.balance + 1,
+                experience: user.experience + Math.floor(Math.random() * 500 + 100),
+                lastmessage_timestamp: createNow()
             }));
-        } catch (e) {
-            console.error(e);
         }
-    });
+
+        // We merge universal variables with some local variables and pass them so they can be used in the bot.
+        mods.map(mod => handleMessage(R.merge(universals, {
+            mod,
+            message
+        })));
+
+        mods.map(mod => {
+            try {
+                handleEvent("message", R.merge(universals, {
+                    mod,
+                    message,
+                    user
+                }));
+            } catch (e) {
+                console.error(e);
+            }
+        });
+    } catch (e) {
+        console.error(e);
+    }
 });
 
 bot.on("messageReactionAdd", (messageReaction, user) => {
