@@ -1,4 +1,5 @@
 const R = require("ramda");
+const path = require("path");
 const {
     getUser,
     updateUser
@@ -12,12 +13,12 @@ module.exports = {
     match: /^(flowergame)\ ([A-z]+)\ ([0-9]+)/gi,
     nearmatch: /^(flowergame)/gi,
     usage: 'flowergame <hot/cold> <bet amount>',
-    help: `\`\`\`The player has to choose hot or cold followed by his bet.
-
-                Three colours are designated hot (red, orange, yellow)     [bet * 2]
-                Three colours are designated cold (blue, purple, pastels)  [bet * 2]
-                Two colours are neutral (black/white)                      [bet]
-                One colour is an automatic win for the host (Rainbow)      [no reward]\`\`\``,
+    help: `-------------**Hot** or **cold**-------------
+    A flower will be planted, depending on the color of the flower you win or lose.\n
+    **Hot flowers**: red, orange, yellow, violet.
+    **Cold flowers**: blue, purlple, pastels, green.
+    **Bot wins**: rainbow.
+    **Return bet**: black, white`,
     description: 'Choose hot or cold. If you guess correctly you will recieve your bet *2',
     run: async({ message, matches, connection }) => {
         const player = await getUser(connection, message.author.id);
@@ -25,15 +26,16 @@ module.exports = {
 
         const bet = parseInt(strBet, 10);
 
+        if (temperature !== 'hot' && temperature !== 'cold') return selfDestroyMessage(message, `Please choose either \`\`hot\`\` or \`\`cold\`\``);
         if (player.balance < bet) return selfDestroyMessage(message, `You do not have enough money! You have **$${player.balance}**!`);
 
-        const flowers = ['red', 'orange', 'yellow', 'blue', 'purple', 'pastels', 'black', 'white', 'rainbow'];
+        const flowers = ['red', 'orange', 'yellow', 'violet', 'blue', 'purple', 'pastels', 'green', 'black', 'white', 'rainbow'];
         const flower = flowers[Math.floor(Math.random() * flowers.length)];
 
         const win = (flower === 'black' || flower === 'white')
                     ? 0
-                  : (temperature === 'hot'  && R.contains(flower)(['red', 'orange', 'yellow'])) ||
-                    (temperature === 'cold' && R.contains(flower)(['blue', 'purple', 'pastels']))
+                  : (temperature === 'hot'  && R.contains(flower)(['red', 'orange', 'yellow', 'violet'])) ||
+                    (temperature === 'cold' && R.contains(flower)(['blue', 'purple', 'pastels', 'green']))
                     ? bet
                   : -bet;
 
@@ -44,10 +46,10 @@ module.exports = {
         }));
 
         // Send the message
-        const msg = `You chose **${matches[2]}**, the seed has grown a(n) **${flower} flower**!\n`;
 
-        await message.channel.send(msg.concat(win === 0 ? `Your bet of **$${matches[3]}** has been returned to you` :
-            win === 1 ? `You guessed it! You recieved **$${matches[3] * 2}**!` :
-            `Better luck next time! You lost **$${matches[3]}**`));
+        await message.channel.send({file: `./resources/flowers/${flower}.png`});
+        await message.channel.send(win === 0 ? `Your bet of **$${matches[3]}** has been returned to you` :
+            win === 1 ? `Correct! You recieved **$${matches[3] * 2}**!` :
+            `Better luck next time! You lost **$${matches[3]}**`);
     }
 };
