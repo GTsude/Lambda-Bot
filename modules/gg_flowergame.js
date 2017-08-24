@@ -5,7 +5,9 @@ const {
     updateUser
 } = require("../database.js");
 const {
-    selfDestroyMessage
+    selfDestroyMessage,
+    simpleEmbed,
+    simpleMessageEmbed
 } = require("../utility.js");
 
 module.exports = {
@@ -26,8 +28,8 @@ module.exports = {
 
         const bet = parseInt(strBet, 10);
 
-        if (temperature !== 'hot' && temperature !== 'cold') return selfDestroyMessage(message, `Please choose either \`\`hot\`\` or \`\`cold\`\``);
-        if (player.balance < bet) return selfDestroyMessage(message, `You do not have enough money! You have **$${player.balance}**!`);
+        if (!R.contains(temperature)(['hot', 'cold'])) return selfDestroyMessage(message, `Please choose either \`\`hot\`\` or \`\`cold\`\``);
+        if (player.balance < bet) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You do not have enough money! You have **$${player.balance}**!`)});
 
         const flowers = ['red', 'orange', 'yellow', 'violet', 'blue', 'purple', 'pastels', 'green', 'black', 'white', 'rainbow'];
         const flower = flowers[Math.floor(Math.random() * flowers.length)];
@@ -47,9 +49,13 @@ module.exports = {
 
         // Send the message
 
-        await message.channel.send({file: `./resources/flowers/${flower}.png`});
-        await message.channel.send(win === 0 ? `Your bet of **$${matches[3]}** has been returned to you` :
-            win === 1 ? `Correct! You recieved **$${matches[3] * 2}**!` :
-            `Better luck next time! You lost **$${matches[3]}**`);
+        const embed = simpleEmbed()
+            .setTitle("Lambda - Flower Game")
+            .attachFile(`./resources/flowers/${flower}.png`)
+            .addField(win === 0 ? `Your bet of **$${matches[3]}** has been returned to you` :
+                win >= 1 ? `Correct! You recieved **$${win}**!` :
+                `Better luck next time! You lost **$${-win}**`, '\u200B');
+
+        await message.channel.send({embed});
     }
 };

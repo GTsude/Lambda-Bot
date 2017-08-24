@@ -1,5 +1,5 @@
 const { getUser } = require("../database.js");
-const { getMention } = require("../utility.js");
+const { getMention, simpleEmbed } = require("../utility.js");
 
 // Level system using triangle numbers.
 const levelRequirement = level => level * 1000;
@@ -20,7 +20,15 @@ module.exports = {
             const level = calculateLevelFromAcc(user.experience);
             const req = levelRequirement(level + 1);
             const nextLevelExperience = req - (accLevelRequirement(level + 1) - user.experience);
-            message.channel.send(`**${bot.users.get(user.id).username}** is level **${level}**. [${nextLevelExperience}/${req}].`);
+
+            const embed = simpleEmbed()
+                .setTitle('Lambda')
+                .setThumbnail(bot.users.get(search).avatarURL)
+                .addField("Level", level)
+                .addField("Experience", user.experience)
+                .addField("Progression", `${nextLevelExperience}/${req}`);
+
+            message.channel.send({embed});
         }catch(e) {
             console.error(e);
         }
