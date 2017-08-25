@@ -1,4 +1,4 @@
-const R = require("ramda");
+    const R = require("ramda");
 const path = require("path");
 const {
     getUser,
@@ -28,7 +28,7 @@ module.exports = {
 
         const bet = parseInt(strBet, 10);
 
-        if (!R.contains(temperature)(['hot', 'cold'])) return selfDestroyMessage(message, `Please choose either \`\`hot\`\` or \`\`cold\`\``);
+        if (!R.contains(temperature)(['hot', 'cold'])) return selfDestroyMessage(message, simpleMessageEmbed(`Please choose either \`\`hot\`\` or \`\`cold\`\``));
         if (player.balance < bet) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You do not have enough money! You have **$${player.balance}**!`)});
 
         const flowers = ['red', 'orange', 'yellow', 'violet', 'blue', 'purple', 'pastels', 'green', 'black', 'white', 'rainbow'];

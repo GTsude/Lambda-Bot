@@ -36,7 +36,7 @@ const createUpdateQuery = (table, dict, predicates) =>
 
 const createSelectQuery = (table, predicates) => `SELECT * FROM ${table} WHERE ${predicates}`;
 
-const createDeleteQuery = (table, predicates) => stripIndents `DELETE ${table} WHERE ${predicates}`;
+const createDeleteQuery = (table, predicates) => stripIndents `DELETE FROM ${table} WHERE ${predicates}`;
 
 const getUserQuery = userID => createSelectQuery('users', `id='${userID}'`);
 
@@ -89,6 +89,7 @@ module.exports = {
     createInsertQuery,
     createUpdateQuery,
     createSelectQuery,
+    createDeleteQuery,
     createUser,
     getUser,
     updateUser,
