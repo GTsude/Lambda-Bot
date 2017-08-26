@@ -4,7 +4,11 @@ const R = require("ramda");
 
 const { stripIndents } = require("common-tags");
 
-const { prefix } = require('../config.json');
+const {
+    prefix,
+    currencySymbol,
+    botName
+} = require('../config.json');
 
 module.exports = {
     name: 'coinflip',
@@ -32,8 +36,12 @@ module.exports = {
             const bet = parseInt(args[1], 10);
             const user = await getUser(connection, message.author.id);
 
+            if (bet < 0) {
+                return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You can not bet a negative amount.`)});
+            }
+
             if ( user.balance < bet ) {
-                return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You don't have enough money to bet λ __${bet}__.`)});
+                return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You don't have enough money to bet ${currencySymbol} __${bet}__.`)});
             } else {
                 await updateUser(connection, user.id, $ => ({
                     balance: $.balance - bet
@@ -49,9 +57,9 @@ module.exports = {
                 }), (err, rows) => {
                     if ( err ) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`Something went wrong! \`${err}\``)});
                     const embed = simpleEmbed()
-                        .setTitle("Lambda - Coinflip")
+                        .setTitle(`${botName} - Coinflip`)
                         .addField("ID", `${rows.insertId}`)
-                        .addField("Stakes", `λ __${bet}__`)
+                        .addField("Stakes", `${currencySymbol} __${bet}__`)
                         .addField("Success!", "A coinflip has just been created!")
                         .addField("Instructions", `To play against ${message.author.username}, type \`${prefix}coinflip start ${rows.insertId}\``);
 
@@ -87,7 +95,7 @@ module.exports = {
 
                             const embed = simpleEmbed()
                                 .setTitle("WINNERRRR")
-                                .addField("The winner is.....", `**${message.author.username}** for λ __${game.bet}__`);
+                                .addField("The winner is.....", `**${message.author.username}** for ${currencySymbol} __${game.bet}__`);
 
                             message.channel.send({embed});
 
@@ -107,7 +115,7 @@ module.exports = {
 
                             const embed = simpleEmbed()
                                 .setTitle("WINNERRRR")
-                                .addField("The winner is.....", `**${bot.users.get(game.userID).username}** for λ __${game.bet}__`);
+                                .addField("The winner is.....", `**${bot.users.get(game.userID).username}** for ${currencySymbol} __${game.bet}__`);
 
                             message.channel.send({embed});
 
@@ -125,13 +133,13 @@ module.exports = {
                 if ( err ) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`Something went wrong! \`${err}\``)});
 
                 const embed = simpleEmbed()
-                    .setTitle("Lambda - Coinflip");
+                    .setTitle(`${botName} - Coinflip`);
 
                 if ( rows.length === 0 ) embed.addField("There are no bets available!", "\u200B");
                 else embed.addField("Info", "The following bets are available");
 
                 rows.forEach( row => {
-                    embed.addField(`${bot.users.get(row.userID).username} for λ __${row.bet}__`, `\`${prefix}coinflip start ${row.gameID}\``);
+                    embed.addField(`${bot.users.get(row.userID).username} for ${currencySymbol} __${row.bet}__`, `\`${prefix}coinflip start ${row.gameID}\``);
                 });
 
 

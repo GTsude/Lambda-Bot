@@ -6,6 +6,10 @@ const {
 const {
 	getUser
 } = require("../database.js");
+const {
+	currencySymbol,
+    botName
+} = require('../config.json');
 
 module.exports = {
 	name: 'balance',
@@ -20,9 +24,9 @@ module.exports = {
 		const search = getMention(message);
 		const user = await getUser(connection, search);
         const embed = simpleEmbed()
-            .setTitle('Lambda - Balance')
+            .setTitle(`${botName} - Balance`)
             .setThumbnail(bot.users.get(user.id).avatarURL)
-            .addField(`${bot.users.get(user.id).username}'s λCredits`, `**λ __${user.balance}__**.`);
+            .addField(`${bot.users.get(user.id).username}'s λCredits`, `**${currencySymbol} __${user.balance}__**.`);
 
 		message.channel.send({embed});
 	}
