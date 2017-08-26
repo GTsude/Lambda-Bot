@@ -1,5 +1,16 @@
-const { getUser, updateUser, createInsertQuery, createSelectQuery, createNow, createDeleteQuery } = require("../database.js");
-const { selfDestroyMessage, simpleEmbed, simpleMessageEmbed } = require("../utility.js");
+const {
+    getUser,
+    updateUser,
+    createInsertQuery,
+    createSelectQuery,
+    createNow,
+    createDeleteQuery
+} = require("../database.js");
+const {
+    selfDestroyMessage,
+    simpleEmbed,
+    simpleMessageEmbed
+} = require("../utility.js");
 const R = require("ramda");
 
 const { stripIndents } = require("common-tags");
@@ -56,8 +67,7 @@ module.exports = {
                     created_timestamp: now
                 }), (err, rows) => {
                     if ( err ) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`Something went wrong! \`${err}\``)});
-                    const embed = simpleEmbed()
-                        .setTitle(`${botName} - Coinflip`)
+                    const embed = simpleEmbed('Coinflip')
                         .addField("ID", `${rows.insertId}`)
                         .addField("Stakes", `${currencySymbol} __${bet}__`)
                         .addField("Success!", "A coinflip has just been created!")
@@ -85,7 +95,7 @@ module.exports = {
 
                     if ( game ) {
                         if ( user.id === game.userID ) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You can't bet against yourself!`)});
-                        if ( user.balance < game.bet ) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`It would seem that you can not afford that game... The bet is for ${game.bet}.`)});
+                        if ( user.balance < game.bet ) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`It would seem that you can not afford that game... The bet is for ${currencySymbol} ${game.bet}.`)});
 
                         if ( Math.random() > 0.5 ) {
                             // current user wins..
@@ -132,14 +142,13 @@ module.exports = {
             connection.query(createSelectQuery('coinflips', `guildID = '${message.guild.id}'`), (err, rows) => {
                 if ( err ) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`Something went wrong! \`${err}\``)});
 
-                const embed = simpleEmbed()
-                    .setTitle(`${botName} - Coinflip`);
+                const embed = simpleEmbed('Coinflip');
 
                 if ( rows.length === 0 ) embed.addField("There are no bets available!", "\u200B");
                 else embed.addField("Info", "The following bets are available");
 
                 rows.forEach( row => {
-                    embed.addField(`${bot.users.get(row.userID).username} for ${currencySymbol} __${row.bet}__`, `\`${prefix}coinflip start ${row.gameID}\``);
+                    embed.addField(`${bot.users.get(row.userID).username} for ${currencySymbol}__${row.bet}__`, `\`${prefix}coinflip start ${row.gameID}\``);
                 });
 
 

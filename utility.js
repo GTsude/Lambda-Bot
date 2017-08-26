@@ -2,7 +2,9 @@ const {
 	stripIndents
 } = require('common-tags');
 const {
-	owner
+	owner,
+	botName,
+	embedColor
 } = require("./config.json");
 const Discord = require('discord.js');
 const R = require('ramda');
@@ -27,15 +29,17 @@ const selfDestroyMessage = async(message, text, timer = 5000) => {
 };
 
 // Create an embed with some preset values
-const simpleEmbed = (data) =>
+const embedColorDec = rgb => rgb[2] * 65536 + rgb[1] * 256 + rgb[0];
+
+const simpleEmbed = (moduleName = "Info") =>
 	new Discord.RichEmbed({
-		color: 16481812,
-		title: "Lambda"
+		color: embedColorDec(embedColor),
+		title: `${botName} - ${moduleName}`
 	});
 
 const simpleMessageEmbed = (message) =>
     new Discord.RichEmbed({
-        color: 16481812,
+        color: embedColorDec(embedColor),
         title: message
     });
 
