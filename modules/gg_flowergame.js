@@ -1,4 +1,4 @@
-    const R = require("ramda");
+const R = require("ramda");
 const path = require("path");
 const {
     getUser,
@@ -9,6 +9,10 @@ const {
     simpleEmbed,
     simpleMessageEmbed
 } = require("../utility.js");
+const {
+    currencySymbol,
+    botName
+} = require('../config.json');
 
 module.exports = {
     name: 'flowergame',
@@ -29,9 +33,22 @@ module.exports = {
         const bet = parseInt(strBet, 10);
 
         if (!R.contains(temperature)(['hot', 'cold'])) return selfDestroyMessage(message, simpleMessageEmbed(`Please choose either \`\`hot\`\` or \`\`cold\`\``));
-        if (player.balance < bet) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You do not have enough money! You have **$${player.balance}**!`)});
+        if (player.balance < bet) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You do not have enough money! You have **${currencySymbol}${player.balance}**!`)});
 
-        const flowers = ['red', 'orange', 'yellow', 'violet', 'blue', 'purple', 'pastels', 'green', 'black', 'white', 'rainbow'];
+        const flowerMappings = {
+            'red': [255, 0, 0],
+            'orange': [255, 128, 0],
+            'yellow': [255, 255, 0],
+            'violet': [255, 0, 255],
+            'blue': [0, 0, 255],
+            'purple': [200, 0, 200],
+            'pastels': [100, 255, 100],
+            'green': [0, 255, 0],
+            'black': [0, 0, 0],
+            'white': [255, 255, 255],
+            'rainbow': [128, 128, 128]
+        };
+        const flowers = Object.keys(flowerMappings);
         const flower = flowers[Math.floor(Math.random() * flowers.length)];
 
         const win = (flower === 'black' || flower === 'white')
@@ -50,11 +67,12 @@ module.exports = {
         // Send the message
 
         const embed = simpleEmbed()
-            .setTitle("Lambda - Flower Game")
+            .setTitle(`${botName} - Flower Game`)
             .attachFile(`./resources/flowers/${flower}.png`)
-            .addField(win === 0 ? `Your bet of **$${matches[3]}** has been returned to you` :
-                win >= 1 ? `Correct! You recieved **$${win}**!` :
-                `Better luck next time! You lost **$${-win}**`, '\u200B');
+            .addField(win === 0 ? `Your bet of **${currencySymbol}${matches[3]}** has been returned to you` :
+                win >= 1 ? `Correct! You recieved **${currencySymbol}${win}**!` :
+                `Better luck next time! You lost **${currencySymbol}${-win}**`, '\u200B')
+            .setColor(flowerMappings[flower]);
 
         await message.channel.send({embed});
     }
