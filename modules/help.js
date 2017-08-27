@@ -12,7 +12,8 @@ module.exports = {
         if (args.length === 1) {
             const cmds = mods.map(c => c.name === c.usage ? c.name : `${c.name}: ${c.usage}`).join('\n');
 
-            const embed = simpleEmbed('Help')
+            const embed = simpleEmbed()
+                .setTitle("Lambda - Help")
                 .addField("Description", `Use \`help [command]\` to find more information about specific modules.`)
                 .addField("Commands", `${mods.filter(m => m.permissionLevel <= calculatePermissionLevel(message)).map(m => `**${m.name}**`).join(", ")}`);
 
@@ -21,7 +22,8 @@ module.exports = {
             const command = findModule(mods, args[1]);
 
             if ( command ) {
-                const embed = simpleEmbed('Help')
+                const embed = simpleEmbed()
+                    .setTitle("Lambda - Help")
                     .addField("Usage", `\`${command.usage}\``)
                     .addField("Help", stripIndents`${command.help}`)
                     .addField("Description", command.description);
