@@ -21,7 +21,8 @@ module.exports = {
             const req = levelRequirement(level + 1);
             const nextLevelExperience = req - (accLevelRequirement(level + 1) - user.experience);
 
-            const embed = simpleEmbed('Level')
+            const embed = simpleEmbed()
+                .setTitle('Lambda')
                 .setThumbnail(bot.users.get(search).avatarURL)
                 .addField("Level", level)
                 .addField("Experience", user.experience)

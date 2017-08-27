@@ -10,7 +10,8 @@ const {
     simpleMessageEmbed
 } = require("../utility.js");
 const {
-    currencySymbol
+    currencySymbol,
+    botName
 } = require('../config.json');
 
 module.exports = {
@@ -32,7 +33,7 @@ module.exports = {
         const bet = parseInt(strBet, 10);
 
         if (!R.contains(temperature)(['hot', 'cold'])) return selfDestroyMessage(message, simpleMessageEmbed(`Please choose either \`\`hot\`\` or \`\`cold\`\``));
-        if (player.balance < bet) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You do not have enough money! You have **${currencySymbol} ${player.balance}**!`)});
+        if (player.balance < bet) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You do not have enough money! You have **${currencySymbol}${player.balance}**!`)});
 
         const flowerMappings = {
             'red': [255, 0, 0],
@@ -65,11 +66,12 @@ module.exports = {
 
         // Send the message
 
-        const embed = simpleEmbed('Flower Game')
+        const embed = simpleEmbed()
+            .setTitle(`${botName} - Flower Game`)
             .attachFile(`./resources/flowers/${flower}.png`)
-            .addField(win === 0 ? `Your bet of **${currencySymbol} ${matches[3]}** has been returned to you` :
-                win >= 1 ? `Correct! You recieved **${currencySymbol} ${win}**!` :
-                `Better luck next time! You lost **${currencySymbol} ${-win}**`, '\u200B')
+            .addField(win === 0 ? `Your bet of **${currencySymbol}${matches[3]}** has been returned to you` :
+                win >= 1 ? `Correct! You recieved **${currencySymbol}${win}**!` :
+                `Better luck next time! You lost **${currencySymbol}${-win}**`, '\u200B')
             .setColor(flowerMappings[flower]);
 
         await message.channel.send({embed});
