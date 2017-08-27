@@ -9,7 +9,9 @@ const {
     simpleEmbed,
     simpleMessageEmbed
 } = require("../utility.js");
-const currencySymbol = require('../config.json');
+const {
+    currencySymbol
+} = require('../config.json');
 
 module.exports = {
     name: 'flowergame',
