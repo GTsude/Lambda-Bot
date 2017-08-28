@@ -79,6 +79,27 @@ const websites = {
 
 		});
 	}),
+    reddit: (query) => new Promise((resolve, reject) => {
+        const url = `https://www.reddit.com/r/${query}/random.json`;
+
+        request(url, { method: 'HEAD', followAllRedirects: true}, (err, response, data) => {
+            const actualURL = response.request.href;
+
+            request({headers: {'User-Agent': 'request.js'}, url: actualURL}, (err, res, data) => {
+                const result = JSON.parse(data);
+
+                if (result[0].data.children[0].data.post_hint !== 'image') return resolve(websites.reddit(query));
+
+                if (result.length > 0) {
+                    return resolve(simpleEmbed(`reddit`).setImage(`${result[0].data.children[0].data.url}`));
+                } else {
+                    return resolve(simpleMessageEmbed(`Whoops! We couldn't find ${query}`));
+                }
+
+            });
+        });
+    }),
+        // https://www.reddit.com/r/nsfw/random.json
     list: () => Promise.resolve(simpleMessageEmbed(`The available lewds sources are: \`${R.join(", ")(R.keys(R.dissoc('list', websites)))}\``))
 };
 
