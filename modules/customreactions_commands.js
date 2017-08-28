@@ -17,6 +17,7 @@ module.exports = {
     name: 'custom_reactions_commands',
     match: /^(customreactions|cr) (add|remove|list)\ *("([^"]+)")* *("([^"]+)")*/gi,
     nearmatch: /^(customreactions|cr)/gi,
+    permissionLevel: 1000, // Temporarily until we figure out how to do proper permissions
     usage: `${prefix}cr list "(optional trigger text)" lists all reactions or, when trigger text is provided, all reactions bound to that trigger,
 ${prefix}cr add "trigger text" "reaction text" to add a reaction,
 ${prefix}cr edit "trigger text" "old reaction text" "new reaction text" to edit a reaction and
