@@ -58,7 +58,7 @@ const websites = {
 			const result = JSON.parse(data);
 
 			if (result.length > 0) {
-				resolve(simpleEmbed(`e621`).addField(result[0].titleWa).setImage(`${result[0].file_url}`));
+				resolve(simpleEmbed(`e621`).setImage(`${result[0].file_url}`));
 			} else {
 				resolve(simpleMessageEmbed(`Whoops! We couldn't find ${query}`));
 			}
@@ -79,8 +79,6 @@ const websites = {
 
 		});
 	}),
-
-    //https://atfbooru.ninja/posts
     list: () => Promise.resolve(simpleMessageEmbed(`The available lewds sources are: \`${R.join(", ")(R.keys(R.dissoc('list', websites)))}\``))
 };
 
@@ -93,7 +91,7 @@ module.exports = {
 		message,
 		matches
 	}) => {
-        if ( !message.channel.nsfw ) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You can only use this command in nsfw channels.`)});
+        // if ( !message.channel.nsfw ) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You can only use this command in nsfw channels.`)});
 		const [, , website, query] = matches;
 
         // Check if website even exists
