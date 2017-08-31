@@ -49,7 +49,7 @@ const handleMessage = (params) => {
 	const matches = matcher.exec(sub);
 
 	// Check prefix
-	if (isPrefixed) {
+	if (isPrefixed || !mod.prefix) {
 		if (matches && (!mod.channel || mod.channel.test(message.channel.type))) {
 			// Too low permission level
 			if (mod.permissionLevel > calculatePermissionLevel(message)) {
@@ -71,6 +71,7 @@ const handleMessage = (params) => {
 
 const forceDefaults = mod => R.merge({
 	permissionLevel: 0,
+    prefix: true,
 	help: 'No help provided',
 	usage: '???',
 	description: 'No description provided'
