@@ -17,12 +17,10 @@ module.exports = {
     usage: `this module is executed automatically. see "${prefix}help customreactions" on how this module works`,
     onMessage: async ({bot, connection, message}) => {
         if ( message.author.id === bot.user.id ) return;
-        connection.query(createSelectQuery('customreactions', `triggerText = '${message.content.replace(/['\\]/g,'')}' AND guildID = '${message.guild.id}'`), (err, rows) => {
-            if ( err ) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`Something went wrong! \`${err}\``)});
+        const [rows] = await connection.execute('SELECT * FROM customreactions WHERE triggerText = ? AND guildID = ?', [message.content, message.guild.id]);
 
-            if ( rows.length !== 0 ) {
-                message.channel.send(rows[Math.floor(Math.random() * rows.length)].reactionText);
-            }
-        });
+        if ( rows.length > 0 ) {
+            message.channel.send(rows[Math.floor(Math.random() * rows.length)].reactionText);
+        }
     },
 };

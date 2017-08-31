@@ -16,8 +16,8 @@ const {
 
 module.exports = {
     name: 'flowergame',
-    match: /^(flowergame)\ ([A-z]+)\ ([0-9]+)/gi,
-    nearmatch: /^(flowergame)/gi,
+    match: /^(fg|flowergame)\ ([A-z]+)\ ([0-9]+)/gi,
+    nearmatch: /^(fg|flowergame)/gi,
     usage: 'flowergame <hot/cold> <bet amount>',
     help: `-------------**Hot** or **cold**-------------
     A flower will be planted, depending on the color of the flower you win or lose.\n
@@ -27,7 +27,7 @@ module.exports = {
     **Return bet**: black, white`,
     description: 'Choose hot or cold. If you guess correctly you will recieve your bet *2',
     run: async({ message, matches, connection }) => {
-        const player = await getUser(connection, message.author.id);
+        const [[player]] = await connection.execute("SELECT * FROM users WHERE id = ?", [message.author.id]);
         const [ _, cmd, temperature, strBet ] = matches;
 
         const bet = parseInt(strBet, 10);
@@ -51,6 +51,7 @@ module.exports = {
         const flowers = Object.keys(flowerMappings);
         const flower = flowers[Math.floor(Math.random() * flowers.length)];
 
+        // Calculate profit/loss
         const win = (flower === 'black' || flower === 'white')
                     ? 0
                   : (temperature === 'hot'  && R.contains(flower)(['red', 'orange', 'yellow', 'violet'])) ||
@@ -58,16 +59,13 @@ module.exports = {
                     ? bet
                   : -bet;
 
-        console.log(win);
+        // Modify player
+        await connection.execute("UPDATE TABLE users SET balance = ? WHERE id = ?", [
+            player.balance + win,
+            player.id
+        ]);
 
-        await updateUser(connection, player.id, $ => ({
-            balance: $.balance + win
-        }));
-
-        // Send the message
-
-        const embed = simpleEmbed()
-            .setTitle(`${botName} - Flower Game`)
+        const embed = simpleEmbed("Flower Game")
             .attachFile(`./resources/flowers/${flower}.png`)
             .addField(win === 0 ? `Your bet of **${currencySymbol}${matches[3]}** has been returned to you` :
                 win >= 1 ? `Correct! You recieved **${currencySymbol}${win}**!` :

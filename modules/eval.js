@@ -9,26 +9,46 @@ module.exports = {
     usage: 'eval <code>',
     nearmatch: /^(eval|\!)/gi,
     permissionLevel: 1000,
-    run: (params) => {
+    run: async (params) => {
         const { connection, message, matches, bot} = params;
 
-        const clean = (text) => { //Used in eval code I stole from someone else :) x2
+        // Clean stuff, idk, not important
+        const clean = (text) => {
             return (typeof(text) === "string") ?
                 text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203)) :
                 text;
         };
 
+        // Get code.
         const code = matches[2];
 
-        try {
-            const evaled = eval(`( _ => ${code} )()`);
-            const post = typeof evaled !== 'string' ? require('util').inspect(evaled) : evaled;
-
-            message.channel.send("```xl\n" + clean(post) + "\n```");
-        } catch (err) {
+        // Catch nasty errors and put them into the chat!
+        const logError = error => {
             message.channel.send("`ERROR` ```fix\n" +
-                clean(err) +
+                clean(error) +
                 "\n```");
+        };
+
+        try {
+            // Async function, to allow for easier shit to be done.
+            const evaled = eval(`( async _ => ${code} )()`);
+
+            // Check if is a Promise (this is the only way to do it, following Promise standard)
+            if ( evaled.then ) {
+                // Wait for callback
+                evaled.then(res => {
+                    const post = typeof evaled !== 'string' ? require('util').inspect(res) : res;
+
+                    message.channel.send("```xl\n" + clean(post) + "\n```");
+                }).catch(logError);
+            } else {
+                // It's not a promise, so just do stuff
+                const post = typeof evaled !== 'string' ? require('util').inspect(evaled) : evaled;
+
+                message.channel.send("```xl\n" + clean(post) + "\n```");
+            }
+        } catch (err) {
+            logError(err);
         }
     }
 };

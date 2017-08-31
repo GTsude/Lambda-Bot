@@ -17,6 +17,7 @@
     "discord.js": "^11.1.0",
     "moment": "^2.18.1",
     "mysql": "^2.14.1",
+    "mysql2": "^1.4.2",
     "ramda": "^0.24.1",
     "request": "^2.81.0",
     "request-promise": "^4.2.1"

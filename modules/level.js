@@ -1,4 +1,3 @@
-const { getUser } = require("../database.js");
 const { getMention, simpleEmbed } = require("../utility.js");
 
 // Level system using triangle numbers.
@@ -16,7 +15,7 @@ module.exports = {
     run: async({message, connection, bot}) => {
         try {
             const search = getMention(message);
-            const user = await getUser(connection, search);
+            const [[user]] = await connection.execute("SELECT * FROM users WHERE id = ?", [message.author.id]);
             const level = calculateLevelFromAcc(user.experience);
             const req = levelRequirement(level + 1);
             const nextLevelExperience = req - (accLevelRequirement(level + 1) - user.experience);

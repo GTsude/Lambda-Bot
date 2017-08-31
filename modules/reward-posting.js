@@ -1,6 +1,3 @@
-const { getUser, updateUser, createNow } = require("../database.js");
-const { selfDestroyMessage } = require("../utility.js");
-
 const moment = require("moment");
 
 module.exports = {
@@ -9,20 +6,20 @@ module.exports = {
     usage: 'Yeah, you just uh... upload stuff, no commands or anything',
     onMessage: async ({connection, message}) => {
         if ( message.attachments.size >= 1 && message.guild.memberCount >= 5 ) {
-            console.log("An image was attached!");
-            const user = await getUser(connection, message.author.id);
+            const [[user]] = await connection.execute("SELECT * FROM users WHERE id = ?", [message.author.id]);
+
             const now = moment();
             const then = moment(user.lastimage_timestamp);
 
-            console.log(now, then, now - then);
-
+            // Calculate if last image was <1 minute ago.
             if ( now - then < 60 * 1000 ) return;
 
-            updateUser(connection, message.author.id, $ => ({
-                balance: $.balance + 5,
-                experience: $.experience + Math.floor(Math.random() * 20),
-                lastimage_timestamp: createNow()
-            }));
+            await connection.execute("UPDATE users SET balance = ?, experience = ?, lastimage_timestamp = ? WHERE id = ?", [
+                user.balance + 5,
+                user.experience + Math.floor(Math.random() * 20),
+                new Date(),
+                user.id
+            ]);
         }
     },
 };

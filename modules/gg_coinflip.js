@@ -45,7 +45,7 @@ module.exports = {
             // cast to numeric string e.g. '0' or '1'
             const isHeads = new String(new Number(args[0] === "heads"));
             const bet = parseInt(args[1], 10);
-            const user = await getUser(connection, message.author.id);
+            const [[user]] = await connection.execute("SELECT * FROM users WHERE id = ?", [message.author.id]);
 
             if (bet < 0) {
                 return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You can not bet a negative amount.`)});
@@ -54,27 +54,26 @@ module.exports = {
             if ( user.balance < bet ) {
                 return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You don't have enough money to bet ${currencySymbol} __${bet}__.`)});
             } else {
-                await updateUser(connection, user.id, $ => ({
-                    balance: $.balance - bet
-                }));
+                await connection.execute("UPDATE TABLE users SET balance = ? WHERE id = ?", [
+                    user.balance - bet,
+                    user.id
+                ]);
 
-                const now = createNow();
-                connection.query(createInsertQuery('coinflips', {
-                    userID: user.id,
-                    guildID: message.guild.id,
+                await connection.execute("INSERT INTO coinflips userID, guildID, bet, isHeads, created_timestamp VALUES (?, ?, ?, ?, ?)", [
+                    user.id,
+                    message.guild.id,
                     bet,
                     isHeads,
-                    created_timestamp: now
-                }), (err, rows) => {
-                    if ( err ) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`Something went wrong! \`${err}\``)});
-                    const embed = simpleEmbed('Coinflip')
-                        .addField("ID", `${rows.insertId}`)
-                        .addField("Stakes", `${currencySymbol} __${bet}__`)
-                        .addField("Success!", "A coinflip has just been created!")
-                        .addField("Instructions", `To play against ${message.author.username}, type \`${prefix}coinflip start ${rows.insertId}\``);
+                    new Date()
+                ]);
 
-                    return message.channel.send({embed});
-                });
+                const embed = simpleEmbed('Coinflip')
+                    .addField("ID", `${rows.insertId}`)
+                    .addField("Stakes", `${currencySymbol} __${bet}__`)
+                    .addField("Success!", "A coinflip has just been created!")
+                    .addField("Instructions", `To play against ${message.author.username}, type \`${prefix}coinflip start ${rows.insertId}\``);
+
+                return message.channel.send({embed});
             }
         } else if ( option === 'start' ) {
             const args = rawArgs.split(" ");

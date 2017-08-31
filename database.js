@@ -1,4 +1,4 @@
-const mysql = require("mysql");
+const mysql = require("mysql2/promise");
 const moment = require('moment');
 const R = require("ramda");
 const { stripIndents } = require("common-tags");
