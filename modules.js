@@ -74,7 +74,8 @@ const forceDefaults = mod => R.merge({
     prefix: true,
 	help: 'No help provided',
 	usage: '???',
-	description: 'No description provided'
+	description: 'No description provided',
+    onLoad: () => {}
 }, mod);
 
 const createSub = message => message.content.substring(prefix.length);

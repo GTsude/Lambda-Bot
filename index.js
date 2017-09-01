@@ -61,7 +61,7 @@ const main = async () => {
     bot.on('ready', () => {
         console.log("Bot is ready");
 
-        mods.map(mod => handleEvent("load", universals));
+        mods.map(mod => handleEvent("load", R.merge(universals, {mod})));
     });
 
     bot.on('message', async message => {

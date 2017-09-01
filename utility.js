@@ -43,6 +43,10 @@ const simpleMessageEmbed = (message) =>
         title: message
     });
 
+const ezSQL = async (message, connection, query) => {
+    message.channel.send(JSON.stringify((await connection.execute(query))[0], null, 2).slice(1, 1000));
+};
+
 
 module.exports = {
 	reportError,
