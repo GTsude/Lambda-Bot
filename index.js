@@ -60,6 +60,8 @@ const main = async () => {
 
     bot.on('ready', () => {
         console.log("Bot is ready");
+
+        mods.map(mod => handleEvent("load", universals));
     });
 
     bot.on('message', async message => {
@@ -67,13 +69,6 @@ const main = async () => {
             console.log(`${message.author.username}: ${message.content}`);
 
 
-
-            // We merge universal variables with some local variables and pass them so they can be used in the bot.
-            // this checks for command hits too, so it uses the `match` prop of a module and runs the `run` prop
-            mods.map(mod => handleMessage(R.merge(universals, {
-                mod,
-                message
-            })));
 
             // Raw message handler i.e. onMessage
             mods.map(mod => {
@@ -86,6 +81,13 @@ const main = async () => {
                     console.error(e);
                 }
             });
+
+            // We merge universal variables with some local variables and pass them so they can be used in the bot.
+            // this checks for command hits too, so it uses the `match` prop of a module and runs the `run` prop
+            mods.map(mod => handleMessage(R.merge(universals, {
+                mod,
+                message
+            })));
         } catch (e) {
             console.error(e);
         }
