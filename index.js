@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const path = require('path');
 const auth = require('./config.json');
 const {
     prefix
@@ -24,16 +25,30 @@ const {
 
 const fs = require("fs");
 
-
 const main = async () => {
     const bot = new Discord.Client();
 
+    const loadDirectory = (directory) => {
+        const items = fs.readdirSync(directory);
+        console.log(items);
+        const mods = items.map(i => {
+            if ( fs.lstatSync(path.join(directory, i)).isDirectory() ) {
+                return loadDirectory(path.join(directory, i));
+            } else {
+                return forceDefaults(require(path.join(directory, i)));
+            }
+        });
+
+        return R.flatten(mods);
+    };
+
+    const mods = loadDirectory(__dirname + '/modules');
+
+
+
     // Here we load the modules from `./modules/`
-    const items = fs.readdirSync(__dirname + '/modules');
-    const mods = items.map(i => forceDefaults(require(`./modules/${i}`)));
 
     const connection = await createConnection(auth);
-
 
     // Some global variables.
     const universals = {
@@ -51,20 +66,7 @@ const main = async () => {
         try {
             console.log(`${message.author.username}: ${message.content}`);
 
-            const [[user]] = await connection.execute("SELECT * FROM users WHERE id = ?", [message.author.id]);
 
-            const then = moment(user.lastmessage_timestamp);
-            const now = moment();
-
-            // Calculate if the last message was longer than a minute ago
-            if ( now - then > 60 * 1000 ) {
-                await connection.execute("UPDATE users SET balance = ?, experience = ?, lastmessage_timestamp = ? WHERE id = ?", [
-                    user.balance + 1,
-                    user.experience + Math.floor(Math.random() * 500 + 100),
-                    new Date(),
-                    user.id
-                ]);
-            }
 
             // We merge universal variables with some local variables and pass them so they can be used in the bot.
             // this checks for command hits too, so it uses the `match` prop of a module and runs the `run` prop
@@ -78,8 +80,7 @@ const main = async () => {
                 try {
                     handleEvent("message", R.merge(universals, {
                         mod,
-                        message,
-                        user
+                        message
                     }));
                 } catch (e) {
                     console.error(e);

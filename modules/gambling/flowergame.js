@@ -3,16 +3,16 @@ const path = require("path");
 const {
     getUser,
     updateUser
-} = require("../database.js");
+} = require("../../database.js");
 const {
     selfDestroyMessage,
     simpleEmbed,
     simpleMessageEmbed
-} = require("../utility.js");
+} = require("../../utility.js");
 const {
     currencySymbol,
     botName
-} = require('../config.json');
+} = require('../../config.json');
 
 module.exports = {
     name: 'flowergame',

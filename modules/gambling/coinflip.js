@@ -5,12 +5,12 @@ const {
     createSelectQuery,
     createNow,
     createDeleteQuery
-} = require("../database.js");
+} = require("../../database.js");
 const {
     selfDestroyMessage,
     simpleEmbed,
     simpleMessageEmbed
-} = require("../utility.js");
+} = require("../../utility.js");
 const R = require("ramda");
 
 const { stripIndents } = require("common-tags");
@@ -19,7 +19,7 @@ const {
     prefix,
     currencySymbol,
     botName
-} = require('../config.json');
+} = require('../../config.json');
 
 module.exports = {
     name: 'coinflip',
