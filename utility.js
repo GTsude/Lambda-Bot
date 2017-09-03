@@ -47,6 +47,9 @@ const ezSQL = async (message, connection, query) => {
     message.channel.send(JSON.stringify((await connection.execute(query))[0], null, 2).slice(1, 1000));
 };
 
+const hasRole = async (member, rolename) =>
+    R.contains(rolename)(member.roles.array().map( x => x.name ));
+
 
 module.exports = {
 	reportError,
@@ -55,5 +58,6 @@ module.exports = {
 	sleep,
 	selfDestroyMessage,
 	simpleEmbed,
-    simpleMessageEmbed
+    simpleMessageEmbed,
+    hasRole
 };
