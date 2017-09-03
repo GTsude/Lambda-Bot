@@ -29,7 +29,7 @@ const selfDestroyMessage = async(message, text, timer = 5000) => {
 };
 
 // Create an embed with some preset values
-const embedColorDec = rgb => rgb[2] * 65536 + rgb[1] * 256 + rgb[0];
+const embedColorDec = rgb => rgb[0] * 65536 + rgb[1] * 256 + rgb[2];
 
 const simpleEmbed = (moduleName = "Info") =>
 	new Discord.RichEmbed({
