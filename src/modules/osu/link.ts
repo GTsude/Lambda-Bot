@@ -3,7 +3,7 @@ import * as osu from "node-osu";
 
 module.exports = {
     name: "osu!link",
-    match: /^(osu) (link)\ ([A-Z]+)/gi,
+    match: /^(osu) (link)\ ([A-z0-9\_]+)/gi,
     nearmatch: /^(osu) (link)/gi,
     usage: 'link <username>',
     isCommand: false,

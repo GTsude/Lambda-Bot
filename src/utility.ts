@@ -6,7 +6,8 @@ import * as Discord from 'discord.js';
 import * as osu from 'node-osu';
 import * as R from 'ramda';
 
-export const getMention = (message) =>
+// Returns an ID of the first user mentioned or the message author
+export const getMention = (message: Discord.Message): string =>
     message.mentions.users.size === 0 ? message.author.id : message.mentions.users.first().id;
 
 // Async sleep event. usage: await sleep(5000); // will sleep for 5000ms

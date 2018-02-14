@@ -1,5 +1,5 @@
-import { selfDestroyMessage, simpleMessageEmbed, escapeQuotes } from "../../utility";
-import config from "../../config";
+import { selfDestroyMessage, simpleMessageEmbed, escapeQuotes } from "../utility";
+import config from "../config";
 
 module.exports = {
     name: 'custom_reactions',

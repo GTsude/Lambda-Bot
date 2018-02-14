@@ -32,6 +32,15 @@ declare global {
         name: string;
     }
 
+    export interface IUser {
+        id: number;
+        balance: number;
+        experience: number;
+        created_timestamp: Date;
+        lastmessage_timestamp: Date;
+        lastimage_timestamp: Date;
+    }
+
     export type RGB = [number, number, number];
 
     export interface IConfig {

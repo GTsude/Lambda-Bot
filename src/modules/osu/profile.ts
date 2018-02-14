@@ -5,7 +5,7 @@ import * as R from "ramda";
 
 module.exports = {
     name: 'osu\!profile',
-    match: /^(osu) (profile) ?([A-Z]+)?/gi,
+    match: /^(osu) (profile) ?([A-z0-9\_]+)?/gi,
     usage: 'profile <optional: username>',
     isCommand: false,
     run: async ({message, connection, matches}) => {
@@ -18,27 +18,28 @@ module.exports = {
         if (!osuUsername) return selfDestroyMessage(message, "Username not found! Please use \`\`osu link <username>\`\` to link your profile!");
 
         // Get user from osu Api
-        const profile = await osuApi.apiCall('/get_user', {u: osuUsername.username});
+        const profile = <IOsuUser> await osuApi.getUser({u: osuUsername.username});
 
-        // Deconstruct profile
-        const {user_id, username, count300, count100, count50, playcount, ranked_score, total_score, pp_rank, level, pp_raw, accuracy, count_rank_ss, count_rank_s, count_rank_a, country, pp_country_rank} = profile[0];
+        console.log(profile);
 
         // Set links for the "More about username"
-        const osutrack = `[osu!track](<https://ameobea.me/osutrack/user/${username}>)`;
-        const osustats = `[osu!stats](<https://osustats.ppy.sh/u/${username}>)`;
-        const osuskills = `[osu!skills](<http://osuskills.tk/user/${username}>)`;
-        const osuchan = `[osu!chan](<;https://syrin.me/osuchan/u/${user_id}/?m=0>)`;
+        const osuprofile = `[osu!profile](<https://osu.ppy.sh/u/${profile.id}>)`;
+        const osutrack = `[osu!track](<https://ameobea.me/osutrack/user/${profile.name}>)`;
+        const osustats = `[osu!stats](<https://osustats.ppy.sh/u/${profile.name}>)`;
+        const osuskills = `[osu!skills](<http://osuskills.tk/user/${profile.name}>)`;
+        const osuchan = `[osu!chan](<https://syrin.me/osuchan/u/${profile.id}/?m=0>)`;
 
         // Construct embed
-        const embed = simpleEmbed(`Stats for ${username}`)
-            .addField(`Performance: ${numberWithCommas(pp_raw)}pp (#${numberWithCommas(pp_rank)}) :flag_${R.toLower(country)}: #${numberWithCommas(pp_country_rank)}`,
-            stripIndents `Ranked Score: ${numberWithCommas(ranked_score)}
-            Total Score: ${numberWithCommas(total_score)}
-            Hit Accuracy: ${Math.floor(accuracy *  1000) / 1000}
-            Play Count: ${numberWithCommas(playcount)}
-            Level: ${level}
-            SS: ${count_rank_ss}, S: ${count_rank_s}, A: ${count_rank_a}`)
-            .addField(`More about ${username}`, `${osutrack} | ${osustats} | ${osuskills} | ${osuchan}`);
+        const embed = simpleEmbed(`Stats for ${profile.name}`)
+            .setThumbnail(`http://s.ppy.sh/a/${profile.id}`)
+            .addField(`Performance: ${numberWithCommas(profile.pp.raw)}pp (#${numberWithCommas(profile.pp.rank)}) :flag_${R.toLower(profile.country)}: #${numberWithCommas(profile.pp.countryRank)}`,
+            stripIndents `Ranked Score: ${numberWithCommas(profile.scores.ranked)}
+            Total Score: ${numberWithCommas(profile.scores.total)}
+            Hit Accuracy: ${Math.floor(parseFloat(profile.accuracy) *  1000) / 1000}
+            Play Count: ${numberWithCommas(profile.counts.plays)}
+            Level: ${profile.level}
+            SS: ${numberWithCommas(profile.counts.SS)}, S: ${numberWithCommas(profile.counts.S)}, A: ${numberWithCommas(profile.counts.A)}`)
+            .addField(`More about ${profile.name}`, `${osuprofile} | ${osutrack} | ${osustats} | ${osuskills} | ${osuchan}`);
 
         await message.channel.send({embed});
     },

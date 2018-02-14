@@ -1,12 +1,13 @@
-import { getMention, selfDestroyMessage, simpleEmbed } from "../../utility";
+import { getMention, selfDestroyMessage, simpleEmbed, numberWithCommas } from "../../utility";
+import config from '../../config';
 
 module.exports = {
-    name: 'donate',
-    match: /^(donate|sendmoney)\ ([0-9]+)\ (.+)/gi,
-    usage: 'donate <amount> <mention>',
-    nearmatch: /^(donate|sendmoney).*/gi,
+    name: 'give',
+    match: /^(donate|sendmoney|give) (.+) ([0-9]+)/gi,
+    usage: 'give <mention> <amount>',
+    nearmatch: /^(donate|sendmoney|give).*/gi,
     run: async ({bot, message, matches, connection}) => {
-        const amount = parseInt(matches[2], 10);
+        const amount = parseInt(matches[3], 10);
         const receiverID = getMention(message);
 
         const notYourselfEmbed = simpleEmbed().addField("Error", "You can't give money to yourself, goofball");
@@ -17,7 +18,7 @@ module.exports = {
             await connection.execute("SELECT * FROM users WHERE id = ?", [receiverID]),
         ]);
 
-        const notEnoughEmbed = simpleEmbed().addField("Error", `You do not have enough money! You have **$${sender.balance}**!`);
+        const notEnoughEmbed = simpleEmbed().addField("Error", `You do not have enough money! You have ${config.currencySymbol}**${sender.balance}**!`);
         if (sender.balance < amount) return selfDestroyMessage(message, {embed: notEnoughEmbed});
 
         await connection.execute("UPDATE users SET balance = balance - ? WHERE id = ?", [
@@ -31,9 +32,9 @@ module.exports = {
         ]);
 
         const embed = simpleEmbed()
-            .setTitle("Lambda - Transaction")
+            .setTitle(`${config.botName} - Transaction`)
             .addField("A transaction was succesfully completed", "\u200B", true)
-            .addField("Transaction Details", `(λ **${amount}**) ${bot.users.get(sender.id).username} → ${bot.users.get(receiver.id).username}`)
+            .addField("Transaction Details", `(${config.currencySymbol} **${numberWithCommas(amount)}**) ${bot.users.get(sender.id).username} → ${bot.users.get(receiver.id).username}`)
             .setTimestamp(new Date());
 
         await message.channel.send({embed});

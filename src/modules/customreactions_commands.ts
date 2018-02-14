@@ -1,8 +1,8 @@
 import * as R from 'ramda';
 
-import { selfDestroyMessage, simpleEmbed, simpleMessageEmbed } from '../../utility.js';
+import { selfDestroyMessage, simpleEmbed, simpleMessageEmbed } from '../utility.js';
 
-import config from '../../config';
+import config from '../config';
 
 const prefix = config['prefix'];
 

@@ -1,73 +1,81 @@
-import * as Discord from 'discord.js';
-import * as path from 'path';
-import config from './config';
+const Discord = require('discord.js');
+const path = require('path');
+const auth = require('./config.json');
+const {
+    prefix
+} = auth;
 
-import * as R from 'ramda';
-import * as moment from 'moment';
-import * as mysql from 'mysql2/promise';
+const R = require('ramda');
+const moment = require('moment');
 
-const createConnection = (authentication) => mysql.createConnection({
-    host: authentication.mysqlHostName || 'localhost',
-    user: authentication.mysqlUsername,
-    password: authentication.mysqlPassword,
-    database: authentication.mysqlDatabase || 'lambda',
-});
+const {
+    getUser,
+    createUpdateQuery,
+    logMessage,
+    createConnection,
+    createNow,
+    updateUser
+} = require('./database.js');
 
-import { handleMessage, handleEvent, forceDefaults } from './modules.js';
+const {
+    handleMessage,
+    handleEvent,
+    forceDefaults
+} = require('./modules.js');
 
-import * as fs from 'fs';
+const fs = require("fs");
 
 const main = async () => {
     const bot = new Discord.Client();
 
-    // Load modules from a directory, recursively.
-    const loadDirectory = (directory: string): Array<IMod> => {
+    const loadDirectory = (directory) => {
         const items = fs.readdirSync(directory);
+        console.log(items);
         const mods = items.map(i => {
-            if (fs.lstatSync(path.join(directory, i)).isDirectory()) {
+            if ( fs.lstatSync(path.join(directory, i)).isDirectory() ) {
                 return loadDirectory(path.join(directory, i));
             } else {
-                if ( i.endsWith(".js") ) {
-                    console.log("Loading " + i);
-                    return forceDefaults(require(path.join(directory, i)));
-                }
+                return forceDefaults(require(path.join(directory, i)));
             }
         });
 
-        // We need to flatten this, because it's a tree, and not an array.
-        return R.flatten(mods).filter( m => m );
+        return R.flatten(mods);
     };
 
     const mods = loadDirectory(__dirname + '/modules');
 
+
+
     // Here we load the modules from `./modules/`
 
-    const connection = await createConnection(config);
+    const connection = await createConnection(auth);
 
     // Some global variables.
     const universals = {
         connection,
         mods,
         Discord,
-        bot,
+        bot
     };
 
     bot.on('ready', () => {
         console.log("Bot is ready");
 
-        mods.map(mod => handleEvent("load", R.merge(universals, { mod })));
+        mods.map(mod => handleEvent("load", R.merge(universals, {mod})));
     });
 
     bot.on('message', async message => {
         try {
             console.log(`${message.author.username}: ${message.content}`);
 
+
+
             // Raw message handler i.e. onMessage
             mods.map(mod => {
                 try {
                     handleEvent("message", R.merge(universals, {
                         mod,
-                        message,
+                        message
                     }));
                 } catch (e) {
                     console.error(e);
@@ -78,7 +86,7 @@ const main = async () => {
             // this checks for command hits too, so it uses the `match` prop of a module and runs the `run` prop
             mods.map(mod => handleMessage(R.merge(universals, {
                 mod,
-                message,
+                message
             })));
         } catch (e) {
             console.error(e);
@@ -90,11 +98,15 @@ const main = async () => {
         mods.map(mod => handleEvent("messageReactionAdd", R.merge(universals, {
             mod,
             messageReaction,
-            user,
+            user
         })));
     });
 
-    bot.login(config.token);
+    // TODO List
+    // Add user specific purge
+
+
+    bot.login(auth.token);
 };
 
 main();

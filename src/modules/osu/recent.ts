@@ -12,8 +12,8 @@ module.exports = {
     run: async ({message, matches}) => {
         // Osu api calls
         const profile = await osuApi.getUser({u: `${matches[3]}`});
-        const recentScore = (await osuApi.getUserRecent({u: profile.name}))[0];
-        const beatmap = (await osuApi.getBeatmaps({b: recentScore.beatmapId}))[0];
+        const [recentScore] = (await osuApi.getUserRecent({u: profile.name}));
+        const [beatmap] = (await osuApi.getBeatmaps({b: recentScore.beatmapId}));
 
         // Beatmap specific info
         const bmDifficulty = beatmap.difficulty;
