@@ -1,4 +1,4 @@
-module.exports = {
+module.exports = <IMod> {
     name: 'sql',
     match: /^(sql)\ (.+)/gi,
     nearmatch: /^(sql)/gi,
@@ -9,5 +9,5 @@ module.exports = {
             if (err) message.channel.send(`\`\`\`fix\n${err.toString()}\`\`\``);
             else message.channel.send(`\`\`\`json\n${JSON.stringify(rows)}\`\`\``);
         });
-    }
+    },
 };

@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "sourceMap": true,
+        "target": "es6",
+        "removeComments": true,
+        "outDir": "./dist/"
+    },
+    "paths": {
+        "*": [
+            "src/types/*",
+            "node_modules"
+        ]
+    },
+    "compileOnSave": true,
+    "exclude": [
+        "node_modules",
+        "./*.ts",
+        ".vscode",
+        "./assets",
+        "dist"
+    ],
+    "include": [
+        "./src/"
+    ]
+}

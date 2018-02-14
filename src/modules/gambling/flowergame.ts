@@ -1,20 +1,11 @@
-const R = require("ramda");
-const path = require("path");
-const {
-    getUser,
-    updateUser
-} = require("../../database.js");
-const {
-    selfDestroyMessage,
-    simpleEmbed,
-    simpleMessageEmbed
-} = require("../../utility.js");
-const {
-    currencySymbol,
-    botName
-} = require('../../config.json');
+import * as R from 'ramda';
+import * as path from 'path';
+import { selfDestroyMessage, simpleEmbed, simpleMessageEmbed } from '../../utility.js';
+import config from '../../config';
 
-module.exports = {
+const resources = path.join(path.dirname(require.main.filename), `../`, `/resources/flowers/`);
+
+module.exports = <IMod> {
     name: 'flowergame',
     match: /^(fg|flowergame)\ ([A-z]+)\ ([0-9]+)/gi,
     nearmatch: /^(fg|flowergame)/gi,
@@ -26,27 +17,27 @@ module.exports = {
     **Bot wins**: rainbow.
     **Return bet**: black, white`,
     description: 'Choose hot or cold. If you guess correctly you will recieve your bet *2',
-    run: async({ message, matches, connection }) => {
-        const [[player]] = await connection.execute("SELECT * FROM users WHERE id = ?", [message.author.id]);
+    run: async ({ message, matches, connection }) => {
+        const [[player]] = <any> await connection.execute("SELECT * FROM users WHERE id = ?", [message.author.id]);
         const [ _, cmd, temperature, strBet ] = matches;
 
         const bet = parseInt(strBet, 10);
 
         if (!R.contains(temperature)(['hot', 'cold'])) return selfDestroyMessage(message, simpleMessageEmbed(`Please choose either \`\`hot\`\` or \`\`cold\`\``));
-        if (player.balance < bet) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You do not have enough money! You have **${currencySymbol}${player.balance}**!`)});
+        if (player.balance < bet) return selfDestroyMessage(message, {embed: simpleMessageEmbed(`You do not have enough money! You have **${config['currencySymbol']}${player.balance}**!`)});
 
         const flowerMappings = {
-            'red': [255, 0, 0],
-            'orange': [255, 128, 0],
-            'yellow': [255, 255, 0],
-            'violet': [255, 0, 255],
-            'blue': [0, 0, 255],
-            'purple': [200, 0, 200],
-            'pastels': [100, 255, 100],
-            'green': [0, 255, 0],
-            'black': [0, 0, 0],
-            'white': [255, 255, 255],
-            'rainbow': [128, 128, 128]
+            red: [255, 0, 0],
+            orange: [255, 128, 0],
+            yellow: [255, 255, 0],
+            violet: [255, 0, 255],
+            blue: [0, 0, 255],
+            purple: [200, 0, 200],
+            pastels: [100, 255, 100],
+            green: [0, 255, 0],
+            black: [0, 0, 0],
+            white: [255, 255, 255],
+            rainbow: [128, 128, 128],
         };
         const flowers = Object.keys(flowerMappings);
         const flower = flowers[Math.floor(Math.random() * flowers.length)];
@@ -60,18 +51,20 @@ module.exports = {
                   : -bet;
 
         // Modify player
-        await connection.execute("UPDATE TABLE users SET balance = ? WHERE id = ?", [
+        await connection.execute("UPDATE users SET balance = ? WHERE id = ?", [
             player.balance + win,
-            player.id
+            player.id,
         ]);
 
+        console.log(resources);
+
         const embed = simpleEmbed("Flower Game")
-            .attachFile(`./resources/flowers/${flower}.png`)
-            .addField(win === 0 ? `Your bet of **${currencySymbol}${matches[3]}** has been returned to you` :
-                win >= 1 ? `Correct! You recieved **${currencySymbol}${win}**!` :
-                `Better luck next time! You lost **${currencySymbol}${-win}**`, '\u200B')
+            .attachFile(path.join(resources, `${flower}.png`))
+            .addField(win === 0 ? `Your bet of **${config['currencySymbol']}${matches[3]}** has been returned to you` :
+                win >= 1 ? `Correct! You recieved **${config['currencySymbol']}${win}**!` :
+                `Better luck next time! You lost **${config['currencySymbol']}${-win}**`, '\u200B')
             .setColor(flowerMappings[flower]);
 
         await message.channel.send({embed});
-    }
+    },
 };

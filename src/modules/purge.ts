@@ -1,10 +1,9 @@
-const { createArgs } = require("../modules.js");
-const { reportError } = require("../utility.js");
+import { createArgs } from "../modules";
 
 module.exports = {
     name: 'purge',
     match: /^(purge)\ *([0-9])*$/gi,
-    usage: 'purge [messages]',
+    usage: 'purge [message]',
     permissionLevel: 100,
     run: async ({message, matches, bot}) => {
         const args = createArgs(message);
@@ -12,9 +11,9 @@ module.exports = {
         const purgeAmount = parseInt(args[1], 10) || 5;
 
         const messages = await message.channel.fetchMessages({
-            limit: purgeAmount
+            limit: purgeAmount,
         });
 
         await message.channel.bulkDelete(messages);
-    }
+    },
 };

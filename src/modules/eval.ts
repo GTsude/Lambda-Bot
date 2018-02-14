@@ -1,22 +1,17 @@
-const database = require('../database.js');
-const ownership = require("../ownership.js");
-const modules = require("../modules.js");
-const config = require("../config.json");
-
-module.exports = {
+module.exports = <IMod> {
     name: 'eval',
     match: /^(eval|\!)\ (.+)/gi,
     usage: 'eval <code>',
     nearmatch: /^(eval|\!)/gi,
-    permissionLevel: 1000,
+    permissionLevel : 1000,
     run: async (params) => {
         const { connection, message, matches, bot} = params;
 
         // Clean stuff, idk, not important
         const clean = (text) => {
             return (typeof(text) === "string") ?
-                text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203)) :
-                text;
+            text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203)) :
+            text;
         };
 
         // Get code.
@@ -25,8 +20,8 @@ module.exports = {
         // Catch nasty errors and put them into the chat!
         const logError = error => {
             message.channel.send("`ERROR` ```fix\n" +
-                clean(error) +
-                "\n```");
+            clean(error) +
+            "\n```");
         };
 
         try {
@@ -50,5 +45,5 @@ module.exports = {
         } catch (err) {
             logError(err);
         }
-    }
+    },
 };

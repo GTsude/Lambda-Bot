@@ -1,21 +1,19 @@
-const { findModule, createArgs, calculatePermissionLevel } = require("../modules.js");
-const { stripIndents } = require('common-tags');
-const { simpleEmbed, simpleMessageEmbed, selfDestroyMessage } = require('../utility.js');
+import { findModule, createArgs, calculatePermissionLevel } from "../modules";
+import { stripIndents } from 'common-tags';
+import { simpleEmbed, simpleMessageEmbed, selfDestroyMessage } from '../utility';
 
 module.exports = {
     name: 'help',
-    match: /^help\ *(\w+)*$/gi,
+    match: /^(help|\?)\ *(\w+)*$/gi,
     usage: 'help [command]',
-    help: 'You\'re not supposed to ask how to use this command, you goofball.',
+    help: `You're not supposed to ask how to use this command, you goofball.`,
     run: ({message, mods}) => {
         const args = createArgs(message);
         if (args.length === 1) {
-            const cmds = mods.map(c => c.name === c.usage ? c.name : `${c.name}: ${c.usage}`).join('\n');
-
             const embed = simpleEmbed()
                 .setTitle("Lambda - Help")
                 .addField("Description", `Use \`help [command]\` to find more information about specific modules.`)
-                .addField("Commands", `${mods.filter(m => m.permissionLevel <= calculatePermissionLevel(message)).map(m => `**${m.name}**`).join(", ")}`);
+                .addField("Commands", `${mods.filter(m => m.isCommand && m.permissionLevel <= calculatePermissionLevel(message)).map(m => `**${m.name}**`).join(", ")}`);
 
             message.channel.send({embed});
         } else {
@@ -28,12 +26,12 @@ module.exports = {
                     .addField("Help", stripIndents`${command.help}`)
                     .addField("Description", command.description);
 
-                    message.channel.send({embed});
+                message.channel.send({embed});
             } else {
                 const embed = simpleMessageEmbed("Command not found!");
 
                 selfDestroyMessage(message, embed);
             }
         }
-    }
+    },
 };

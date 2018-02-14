@@ -1,4 +1,7 @@
 node_modules/
-config.json
+package-lock.json
+src/config.ts
 .ftpconfig
-modules/notifyme.js
+src/notifyme.ts
+dist/
+.ftpignore
